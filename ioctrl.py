@@ -9,3 +9,6 @@ class GpioCtrl(object):
         GPIO.setmode(GPIO.BOARD)
         GPIO.setup(self.CHANNEL, GPIO.IN, pull_up_down=GPIO.PUD_UP)
         GPIO.setup(self.OUTPUT_IR_LED, GPIO.OUT)
+
+    def Receive(self):
+        pass
