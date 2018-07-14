@@ -1,16 +1,40 @@
-# -*- coding: utf-8 -*-
-from code.ioctrl import GpioCtrl
+import logging
 import threading
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+from ioctrl import GpioCtrl
+
 
 class Processes(threading.Thread):
     flag_ir_send_act = False
+    ALIVE_NOTIFY_JOB_ID = "main_schedule"
 
-    def __init__(self):
-        self.Gpio_Ctrl = GpioCtrl()
+    def __init__(self, config):
+        super().__init__(daemon=True)
+        self.logger = logging.getLogger(__name__)
+        self.config = config
 
-    def IR_Send(self):
-        pass
+        self._gpio = GpioCtrl()
+
+        self._scheduler = BackgroundScheduler()
+        self._scheduler.add_job(self.IR_Send,
+                                trigger="interval",
+                                name=Processes.ALIVE_NOTIFY_JOB_ID,
+                                id=Processes.ALIVE_NOTIFY_JOB_ID,
+                                minutes=config.Time.time_main_schedule)
+
+        self.restart_event = threading.Event()
+
+    def run(self):
+        self._gpio.start()
+        self._scheduler.start()
 
     def shutdown(self):
-        self.Gpio_Ctrl.stop()
+        if self._scheduler.running:
+            self._scheduler.shutdown(wait=True)
 
+        self._gpio.stop()
+
+    def IR_Send(self):
+        logging.info("To send")
