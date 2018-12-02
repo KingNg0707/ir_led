@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+from functools import reduce
 
 from dateutil.parser import parse
 
@@ -31,3 +32,7 @@ def get_datetime_now(tz=None):
 
 def time_calibrate(datetime1, datetime2, second_delta):
     return (timedelta(seconds=second_delta) - (datetime2 - datetime1)).total_seconds()
+
+def str2float(s):
+     L=s.split('.')
+     return reduce(lambda x,y:y+x*10,map(int,L[0]))+reduce(lambda x,y:y+x*10,map(int,L[1]))/10**len(L[1])

@@ -1,5 +1,7 @@
 import logging
 import threading
+import time
+import datetime
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -38,3 +40,12 @@ class Processes(threading.Thread):
 
     def IR_Send(self):
         logging.info("To send")
+        cmd = self._gpio.ir_cmd
+        if cmd:
+            output = True
+            for i in cmd:
+                self._gpio.output(self._gpio._OUTPUT_IR_LED, output)
+                time.sleep(cmd[i])
+                output = not output
+
+        self._gpio.ir_cmd = []
